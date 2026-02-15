@@ -1,0 +1,31 @@
+{
+    "name": "polar-apollo",
+    "displayName": "Polar Apollo",
+    "description": "Chat bridge for AI agent orchestration — enables programmatic task delegation to Antigravity",
+    "version": "0.1.0",
+    "engines": {
+        "vscode": "^1.85.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "extensionKind": [
+        "ui"
+    ],
+    "activationEvents": [
+        "onStartupFinished"
+    ],
+    "main": "./extension.js",
+    "contributes": {
+        "commands": [
+            {
+                "command": "polarApollo.sendPrompt",
+                "title": "Polar Apollo: Send Prompt to Chat"
+            },
+            {
+                "command": "polarApollo.status",
+                "title": "Polar Apollo: Show Status"
+            }
+        ]
+    }
+}

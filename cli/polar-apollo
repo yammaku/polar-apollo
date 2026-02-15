@@ -1,0 +1,81 @@
+#!/bin/bash
+# polar-apollo — Send tasks to Antigravity chat from the command line
+#
+# Usage:
+#   polar-apollo "Your prompt here"              # send to current session
+#   polar-apollo --new "Start a fresh task"      # open new session first
+#   polar-apollo --file /path/to/prompt.md       # read prompt from file
+#   polar-apollo --new --file /path/to/prompt.md # new session + file
+
+set -e
+
+INBOX_DIR="$HOME/.antigravity/polar-apollo-inbox"
+REQUEST_FILE="$INBOX_DIR/request.json"
+
+NEW_SESSION="false"
+FILE_MODE=""
+PROMPT=""
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --new|-n)
+      NEW_SESSION="true"
+      shift
+      ;;
+    --file|-f)
+      FILE_MODE="$2"
+      shift 2
+      ;;
+    --help|-h)
+      echo "polar-apollo — Send tasks to Antigravity chat"
+      echo ""
+      echo "Usage:"
+      echo "  polar-apollo \"Your prompt\"              # send to current session"
+      echo "  polar-apollo --new \"Fresh task\"          # new session + send"
+      echo "  polar-apollo --file /path/to/prompt.md   # long prompt from file"
+      echo "  polar-apollo --new --file prompt.md      # new session + file"
+      echo ""
+      echo "Options:"
+      echo "  --new, -n     Open a new Antigravity session before sending"
+      echo "  --file, -f    Read prompt from a file instead of command line"
+      echo "  --help, -h    Show this help message"
+      exit 0
+      ;;
+    *)
+      PROMPT="$1"
+      shift
+      ;;
+  esac
+done
+
+if [[ -z "$PROMPT" && -z "$FILE_MODE" ]]; then
+  echo "Error: No prompt provided. Use --help for usage."
+  exit 1
+fi
+
+if [[ -n "$FILE_MODE" ]]; then
+  if [[ ! -f "$FILE_MODE" ]]; then
+    echo "Error: File not found: $FILE_MODE"
+    exit 1
+  fi
+  PROMPT=$(cat "$FILE_MODE")
+fi
+
+mkdir -p "$INBOX_DIR"
+
+python3 -c "
+import json, sys
+prompt = sys.argv[1]
+new_session = sys.argv[2] == 'true'
+with open(sys.argv[3], 'w') as f:
+    json.dump({'prompt': prompt, 'newSession': new_session}, f, ensure_ascii=False)
+" "$PROMPT" "$NEW_SESSION" "$REQUEST_FILE"
+
+DISPLAY_PROMPT="${PROMPT:0:60}"
+if [ ${#PROMPT} -gt 60 ]; then
+  DISPLAY_PROMPT="${DISPLAY_PROMPT}..."
+fi
+
+echo "🚀 polar-apollo → \"$DISPLAY_PROMPT\""
+[[ "$NEW_SESSION" == "true" ]] && echo "   (new session)"
+echo "✅ Sent to Antigravity"
