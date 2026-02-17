@@ -1,8 +1,8 @@
 {
     "name": "polar-apollo",
     "displayName": "Polar Apollo",
-    "description": "Chat bridge for AI agent orchestration — enables programmatic task delegation to Antigravity",
-    "version": "0.1.0",
+    "description": "WebSocket bridge for OpenClaw ↔ Antigravity — registers as an OpenClaw node for AI-to-AI task delegation",
+    "version": "0.2.0",
     "engines": {
         "vscode": "^1.85.0"
     },
@@ -25,6 +25,10 @@
             {
                 "command": "polarApollo.status",
                 "title": "Polar Apollo: Show Status"
+            },
+            {
+                "command": "polarApollo.reconnect",
+                "title": "Polar Apollo: Reconnect to Gateway"
             }
         ]
     }
